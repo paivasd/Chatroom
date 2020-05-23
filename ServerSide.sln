@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerSide", "ServerSide\ServerSide.csproj", "{6E3683AB-734A-4AEC-B7CA-8126D2275B40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientSide", "ClientSide\ClientSide.csproj", "{382F56DE-3943-47EE-BEE1-057FB5954E10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZerverDAO", "DAO\ZerverDAO.csproj", "{DE1D26BB-6A54-4822-B975-086ECA430C1A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6E3683AB-734A-4AEC-B7CA-8126D2275B40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E3683AB-734A-4AEC-B7CA-8126D2275B40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E3683AB-734A-4AEC-B7CA-8126D2275B40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E3683AB-734A-4AEC-B7CA-8126D2275B40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{382F56DE-3943-47EE-BEE1-057FB5954E10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{382F56DE-3943-47EE-BEE1-057FB5954E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{382F56DE-3943-47EE-BEE1-057FB5954E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{382F56DE-3943-47EE-BEE1-057FB5954E10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE1D26BB-6A54-4822-B975-086ECA430C1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE1D26BB-6A54-4822-B975-086ECA430C1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE1D26BB-6A54-4822-B975-086ECA430C1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE1D26BB-6A54-4822-B975-086ECA430C1A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C75C9A5-20A7-43EB-B758-99405D73C94E}
+	EndGlobalSection
+EndGlobal
