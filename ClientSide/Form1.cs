@@ -57,6 +57,7 @@ namespace ClientSide
         private Dictionary<Chatroom, Guid> dictionaryChatRoomV2;
         private List<Guid> usersGuid;
         private Message message;
+        private Guid messageGuid;
         enum Type
         {
             Text,
@@ -98,6 +99,7 @@ namespace ClientSide
                 x = new User();
                 x.Username = nickBox.Text;
                 x.GlobalIdentifier = Guid.NewGuid();
+                
 
                 ipBox.Enabled = false;
                 nickBox.Enabled = false;
@@ -155,7 +157,7 @@ namespace ClientSide
                     message = JsonConvert.DeserializeObject<Message>(response);
                     if (message.MessageType == Message.Type.Text)
                     {
-                        this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { x.Username +" said: " + message.MessageBody });
+                        this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { message.userGuid +" said: " + message.MessageBody });
                     }
                     if(message.MessageType == Message.Type.Server)
                     {
@@ -243,6 +245,8 @@ namespace ClientSide
                 message = new Message();
                 message.MessageBody = messageBox.Text;
                 message.MessageType = Message.Type.Text;
+                message.chatGuid = messageGuid;
+                message.userGuid = x.GlobalIdentifier;
                 string json;
                 json = JsonConvert.SerializeObject(message);
 
@@ -312,6 +316,32 @@ namespace ClientSide
 
         private void button1_Click_1(object sender, EventArgs e)
         {
+            messageGuid = AssignMessageId();
+            //string curItem = listBox1.SelectedItem.ToString();
+
+            //foreach (KeyValuePair<Chatroom, Guid> item in dictionaryChatRoomV2)
+            //{
+            //    if (item.Key.ChatName == curItem)
+            //    {
+            //        item.Key.usersGuid.Add(x.GlobalIdentifier);
+
+            //        button1.Enabled = false;
+            //        messageBox.Enabled = true;
+            //        sendButton.Enabled = true;
+            //        chatBox.Enabled = true;
+            //        message.chatGuid = item.Key.Identifier;
+
+
+
+            //    }
+            //}
+            //sw.Flush();
+            
+
+
+        }
+        private Guid AssignMessageId()
+        {
             string curItem = listBox1.SelectedItem.ToString();
 
             foreach (KeyValuePair<Chatroom, Guid> item in dictionaryChatRoomV2)
@@ -320,24 +350,26 @@ namespace ClientSide
                 {
                     item.Key.usersGuid.Add(x.GlobalIdentifier);
 
-                    button1.Enabled = false;
+                    //button1.Enabled = false;
                     messageBox.Enabled = true;
                     sendButton.Enabled = true;
                     chatBox.Enabled = true;
-                    
+                    messageGuid = item.Key.Identifier;
+
+                    break;
 
                 }
+                //else
+                //{
+                //    MessageBox.Show("Please choose a room");
+                //    messageGuid = Guid.Empty;
+                //}
             }
-            //string json;
-            //json = JsonConvert.SerializeObject(dictionaryChatRoomV2);
-            //message = new Message();
-            //message.MessageBody = json;
-            //message.MessageType = Message.Type.Room;
-            //sw.WriteLine(message);
-            //sw.Flush();
-
-
-
+            if(messageGuid == Guid.Empty)
+            {
+                MessageBox.Show("Please choose a room");
+            }
+            return messageGuid;
         }
 
         private void Form1_Load(object sender, EventArgs e)

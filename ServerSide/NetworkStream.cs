@@ -70,6 +70,7 @@ namespace ServerSide
                 Chatroom chat2 = new Chatroom("EDJD");
                 dictionaryChatRoomV2.Add(chat1.Identifier, chat1.ChatName);
                 dictionaryChatRoomV2.Add(chat2.Identifier, chat2.ChatName);
+               
 
                 dictionaryChatRoom.Add(chat1, chat1.Identifier);
                 dictionaryChatRoom.Add(chat2, chat2.Identifier);
@@ -284,18 +285,22 @@ namespace ServerSide
         public static void SendUserMessagesObject(string userName, Message currentMessage)
         {
             StreamWriter sw;
+            Chatroom aux;
+            dictionaryChatRoomV3.TryGetValue(currentMessage.chatGuid, out aux);
 
-            e = new StatusChangedEventArgs(userName + " said: " + currentMessage.MessageBody.ToString());
+            e = new StatusChangedEventArgs(userName + " said: " + currentMessage.MessageBody.ToString() + " to " + aux.ChatName + " chatroom.");
             OnStatusChanged(e);
 
             string json;
             json = JsonConvert.SerializeObject(currentMessage);
 
-            User[] users = new User[dictionaryUsers.Count];
+            //User[] users = new User[dictionaryUsers.Count]; 
+            User[] users = new User[aux.usersDictionary.Count];
 
-            dictionaryUsers.Values.CopyTo(users, 0);
+            //dictionaryUsers.Values.CopyTo(users, 0);
+            aux.usersDictionary.Values.CopyTo(users, 0);
 
-            for (int i = 0; i < users.Length; i++)
+            for (int i = 0; i < users.Length; i++) // não pode ser para estes todos, só para os da sala guid
             {
                 try
                 {
@@ -315,23 +320,20 @@ namespace ServerSide
             }
         }
 
-        public static void AddUserToChatRoom(Message currentMessage)
+        public static void AssignUserToChat(User currentUser, Message currentMessage)
         {
-            //Dictionary<Chatroom, Guid> temp;
-            //temp = JsonConvert.DeserializeObject<Dictionary<Chatroom, Guid>>(currentMessage.MessageBody);
-
-            //foreach (KeyValuePair<Chatroom,Guid> item in temp)
-            //{
-            //    foreach(KeyValuePair<Chatroom, Guid> item2 in dictionaryChatRoom)
-            //    {
-            //        if(item.Value == item2.Value)
-            //        {
-            //            item.Key.usersGuid.Contains(item2.Key.usersGuid.Any());
-            //        }
-            //    }
-
-
-            //}
+            foreach (KeyValuePair<Guid, Chatroom> item in dictionaryChatRoomV3)
+            {
+                if(item.Key == currentMessage.chatGuid)
+                {
+                    if(!item.Value.usersDictionary.ContainsKey(currentUser.GlobalIdentifier))
+                    {
+                        
+                        item.Value.usersDictionary.Add(currentUser.GlobalIdentifier, currentUser);
+                    }
+                    
+                }
+            }
         }
     }
 
@@ -441,12 +443,13 @@ namespace ServerSide
                         currentMessage = JsonConvert.DeserializeObject<Message>(strAnswer);
                         if(currentMessage.MessageType == Message.Type.Text)
                         {
+                            NetworkStream.AssignUserToChat(currentUser, currentMessage);
                             NetworkStream.SendUserMessagesObject(currentUser.Username, currentMessage);
                         }
                         if(currentMessage.MessageType == Message.Type.Room)
                         {
-                           
-                            NetworkStream.AddUserToChatRoom(currentMessage);
+                            
+                            //NetworkStream.AddUserToChatRoom(currentMessage);
                         }
 
 

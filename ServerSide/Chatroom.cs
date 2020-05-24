@@ -24,7 +24,8 @@ namespace ServerSide
 
         public Type type { get; set; }
 
-        public List<Guid> usersGuid = new List<Guid>();
+        //public List<Guid> usersGuid = new List<Guid>();
+        public Dictionary<Guid, User> usersDictionary = new Dictionary<Guid, User>();
 
         public enum Type
         {
