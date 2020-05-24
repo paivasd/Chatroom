@@ -68,12 +68,14 @@
             // 
             // chatBox
             // 
+            this.chatBox.Enabled = false;
             this.chatBox.Location = new System.Drawing.Point(31, 64);
             this.chatBox.Multiline = true;
             this.chatBox.Name = "chatBox";
             this.chatBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.chatBox.Size = new System.Drawing.Size(374, 310);
             this.chatBox.TabIndex = 3;
+            this.chatBox.TextChanged += new System.EventHandler(this.chatBox_TextChanged);
             // 
             // messageBox
             // 

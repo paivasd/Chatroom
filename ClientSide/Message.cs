@@ -9,13 +9,14 @@ namespace ClientSide
     class Message
     {
         public string MessageBody { get; set; }
-
-        public Type type { get; set; }
+        public Type MessageType { get; set; }
 
         public enum Type
         {
             Text,
-            Room
+            Room,
+            Server,
+            Guid
         }
     }
 }

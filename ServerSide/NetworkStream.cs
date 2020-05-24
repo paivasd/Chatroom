@@ -38,6 +38,8 @@ namespace ServerSide
         public static Dictionary<Guid, User> dictionaryUsers = new Dictionary<Guid, User>();
         public static Dictionary<User, Guid> dictionaryConnections = new Dictionary<User, Guid>();
         public static Dictionary<Chatroom, Guid> dictionaryChatRoom = new Dictionary<Chatroom, Guid>();
+        public static Dictionary<Guid, Chatroom> dictionaryChatRoomV3 = new Dictionary<Guid, Chatroom>();
+        public static Dictionary<Guid, string> dictionaryChatRoomV2 = new Dictionary<Guid, string>();
 
         //  public static Dictionary<int, List<User>> dictionaryUsers = new Dictionary<int, List<User>>();
 
@@ -46,6 +48,7 @@ namespace ServerSide
 
         private Thread thrListener;
         private TcpListener _tcpListener;
+        private Message currentMessage;
 
         //event arg handler
         public static event StatusChangedEventHandler StatusChanged;
@@ -65,8 +68,16 @@ namespace ServerSide
             {
                 Chatroom chat1 = new Chatroom("LESI"); // VERIFICAR ESTA ABORDAGEM, NÃO PARECE CORRETA.................
                 Chatroom chat2 = new Chatroom("EDJD");
+                dictionaryChatRoomV2.Add(chat1.Identifier, chat1.ChatName);
+                dictionaryChatRoomV2.Add(chat2.Identifier, chat2.ChatName);
+
                 dictionaryChatRoom.Add(chat1, chat1.Identifier);
                 dictionaryChatRoom.Add(chat2, chat2.Identifier);
+
+
+                dictionaryChatRoomV3.Add(chat1.Identifier, chat1);
+                dictionaryChatRoomV3.Add(chat2.Identifier, chat2);
+
 
                 IPAddress ipaLocal = _ip;
                 _tcpListener = new TcpListener(IPAddress.Any, 9000);
@@ -102,8 +113,12 @@ namespace ServerSide
             dictionaryUsers.Add(currentUser.GlobalIdentifier, currentUser);
             dictionaryConnections.Add(currentUser, currentUser.GlobalIdentifier);
 
+            Message currentMessage = new Message();
+            currentMessage.MessageBody = dictionaryUsers[currentUser.GlobalIdentifier] + " connected to server.";
+            currentMessage.MessageType = Message.Type.Server;
+
             //SendServerMessages(dictionaryUsers[currentUser.GlobalIdentifier] + " connected to server");
-            SendServerMessages(dictionaryUsers[currentUser.GlobalIdentifier] + " connected to server"); // TÁ CERTO
+            SendServerMessagesObject(currentMessage); // TÁ CERTO
                                                                                                              // SÓ FALTA ARRANJAR
 
         }
@@ -137,14 +152,19 @@ namespace ServerSide
             OnStatusChanged(e);
             try
             {
-                if (dictionaryChatRoom.Count == 0)
+                if (dictionaryChatRoomV2.Count == 0)
                 {
                     return;
                 }
-                string json = JsonConvert.SerializeObject(dictionaryChatRoom);
+                string json = JsonConvert.SerializeObject(dictionaryChatRoomV2);
+                Message chatrooms = new Message();
+                chatrooms.MessageBody = json;
+                chatrooms.MessageType = Message.Type.Room;
+
+                string _json = JsonConvert.SerializeObject(chatrooms);
 
                 sw = new StreamWriter(currentUser.UserTcp.GetStream());
-                sw.WriteLine(json);
+                sw.WriteLine(_json);
                 sw.Flush();
                 sw = null;
             }
@@ -156,6 +176,7 @@ namespace ServerSide
 
 
         }
+
 
         public static void SendServerMessages(string message)
         {
@@ -179,6 +200,42 @@ namespace ServerSide
 
                     sw = new StreamWriter(users[i].UserTcp.GetStream());
                     sw.WriteLine("Server: " + message);
+                    sw.Flush();
+                    sw = null;
+                }
+                catch
+                {
+                    DeleteUser(users[i]);
+                }
+            }
+        }
+
+
+        // MENSAGENS OBJECTO //
+        public static void SendServerMessagesObject(Message currentMessage)
+        {
+            StreamWriter sw;
+
+            StatusChangedEventArgs e = new StatusChangedEventArgs("Server: " + currentMessage.MessageBody);
+            OnStatusChanged(e);
+
+            User[] users = new User[dictionaryUsers.Count];
+            dictionaryUsers.Values.CopyTo(users, 0);
+
+            string json = JsonConvert.SerializeObject(currentMessage);
+
+            for (int i = 0; i < users.Length; i++)
+            {
+                try
+                {
+                    if (currentMessage.MessageBody.Trim() == "" || users[i] == null)
+                    {
+                        continue;
+                    }
+
+                    sw = new StreamWriter(users[i].UserTcp.GetStream());
+                    //sw.WriteLine("Server: " + currentMessage.MessageBody);
+                    sw.WriteLine(json);
                     sw.Flush();
                     sw = null;
                 }
@@ -221,6 +278,61 @@ namespace ServerSide
                 }
             }
         }
+
+        // MENSAGENS OBJECTO //
+
+        public static void SendUserMessagesObject(string userName, Message currentMessage)
+        {
+            StreamWriter sw;
+
+            e = new StatusChangedEventArgs(userName + " said: " + currentMessage.MessageBody.ToString());
+            OnStatusChanged(e);
+
+            string json;
+            json = JsonConvert.SerializeObject(currentMessage);
+
+            User[] users = new User[dictionaryUsers.Count];
+
+            dictionaryUsers.Values.CopyTo(users, 0);
+
+            for (int i = 0; i < users.Length; i++)
+            {
+                try
+                {
+                    if (currentMessage.MessageBody.Trim() == "" || users[i].UserTcp == null)
+                    {
+                        continue;
+                    }
+                    sw = new StreamWriter(users[i].UserTcp.GetStream());
+                    sw.WriteLine(json);
+                    sw.Flush();
+                    sw = null;
+                }
+                catch
+                {
+                    DeleteUser(users[i]);
+                }
+            }
+        }
+
+        public static void AddUserToChatRoom(Message currentMessage)
+        {
+            //Dictionary<Chatroom, Guid> temp;
+            //temp = JsonConvert.DeserializeObject<Dictionary<Chatroom, Guid>>(currentMessage.MessageBody);
+
+            //foreach (KeyValuePair<Chatroom,Guid> item in temp)
+            //{
+            //    foreach(KeyValuePair<Chatroom, Guid> item2 in dictionaryChatRoom)
+            //    {
+            //        if(item.Value == item2.Value)
+            //        {
+            //            item.Key.usersGuid.Contains(item2.Key.usersGuid.Any());
+            //        }
+            //    }
+
+
+            //}
+        }
     }
 
     class Connection
@@ -229,6 +341,8 @@ namespace ServerSide
         string json;
         User currentUser;
         Chatroom currentChat;
+        Message currentMessage;
+
 
         private Thread thrSender;
         private StreamReader sr;
@@ -321,8 +435,24 @@ namespace ServerSide
                     }
                     else
                     {
+
+                        /// MENSAGEM OBJETO //
+
+                        currentMessage = JsonConvert.DeserializeObject<Message>(strAnswer);
+                        if(currentMessage.MessageType == Message.Type.Text)
+                        {
+                            NetworkStream.SendUserMessagesObject(currentUser.Username, currentMessage);
+                        }
+                        if(currentMessage.MessageType == Message.Type.Room)
+                        {
+                           
+                            NetworkStream.AddUserToChatRoom(currentMessage);
+                        }
+
+
                         // broadcast
-                        NetworkStream.SendUserMessages(currentUser.Username, strAnswer);
+                        //NetworkStream.SendUserMessages(currentUser.Username, strAnswer);
+                       
                     }
                 }
             }
