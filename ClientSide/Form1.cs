@@ -80,7 +80,6 @@ namespace ClientSide
             InitializeComponent();
             dictionaryChatRoom = new Dictionary<Guid, string>();
             dictionaryChatRoomV2 = new Dictionary<Chatroom, Guid>();
-           
 
             
 
