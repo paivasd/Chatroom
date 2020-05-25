@@ -157,7 +157,7 @@ namespace ClientSide
                     message = JsonConvert.DeserializeObject<Message>(response);
                     if (message.MessageType == Message.Type.Text)
                     {
-                        this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { message.userGuid +" said: " + message.MessageBody });
+                        this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { message.UserName +" said: " + message.MessageBody });
                     }
                     if(message.MessageType == Message.Type.Server)
                     {
@@ -247,6 +247,7 @@ namespace ClientSide
                 message.MessageType = Message.Type.Text;
                 message.chatGuid = messageGuid;
                 message.userGuid = x.GlobalIdentifier;
+                message.UserName = x.Username;
                 string json;
                 json = JsonConvert.SerializeObject(message);
 
@@ -317,6 +318,10 @@ namespace ClientSide
         private void button1_Click_1(object sender, EventArgs e)
         {
             messageGuid = AssignMessageId();
+            SendJoinMessage();
+            messageBox.Enabled = true;
+            sendButton.Enabled = true;
+            chatBox.Enabled = true;
             //string curItem = listBox1.SelectedItem.ToString();
 
             //foreach (KeyValuePair<Chatroom, Guid> item in dictionaryChatRoomV2)
@@ -336,10 +341,26 @@ namespace ClientSide
             //    }
             //}
             //sw.Flush();
-            
+
 
 
         }
+        private void SendJoinMessage()
+        {
+                // MESSAGE OBJECT //
+                message = new Message();
+                message.MessageBody = null;
+                message.MessageType = Message.Type.Join;
+                message.chatGuid = messageGuid;
+                message.userGuid = x.GlobalIdentifier;
+                string json;
+                json = JsonConvert.SerializeObject(message);
+
+                //sw.WriteLine(messageBox.Text);
+                sw.WriteLine(json);
+                sw.Flush();
+        }
+        
         private Guid AssignMessageId()
         {
             string curItem = listBox1.SelectedItem.ToString();
@@ -351,9 +372,7 @@ namespace ClientSide
                     item.Key.usersGuid.Add(x.GlobalIdentifier);
 
                     //button1.Enabled = false;
-                    messageBox.Enabled = true;
-                    sendButton.Enabled = true;
-                    chatBox.Enabled = true;
+                    
                     messageGuid = item.Key.Identifier;
 
                     break;

@@ -14,12 +14,15 @@ namespace ClientSide
         public Guid chatGuid { get; set; }
         public Guid userGuid { get; set; }
 
+        public string UserName { get; set; }
+
         public enum Type
         {
             Text,
             Room,
             Server,
-            Guid
+            Guid,
+            Join
         }
     }
 }

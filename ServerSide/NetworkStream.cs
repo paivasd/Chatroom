@@ -288,7 +288,7 @@ namespace ServerSide
             Chatroom aux;
             dictionaryChatRoomV3.TryGetValue(currentMessage.chatGuid, out aux);
 
-            e = new StatusChangedEventArgs(userName + " said: " + currentMessage.MessageBody.ToString() + " to " + aux.ChatName + " chatroom.");
+            e = new StatusChangedEventArgs( userName + " said: " + currentMessage.MessageBody.ToString() + " to " + aux.ChatName + " chatroom.");
             OnStatusChanged(e);
 
             string json;
@@ -322,6 +322,7 @@ namespace ServerSide
 
         public static void AssignUserToChat(User currentUser, Message currentMessage)
         {
+            currentUser.CurrentChat = currentMessage.chatGuid;
             foreach (KeyValuePair<Guid, Chatroom> item in dictionaryChatRoomV3)
             {
                 if(item.Key == currentMessage.chatGuid)
@@ -331,7 +332,15 @@ namespace ServerSide
                         
                         item.Value.usersDictionary.Add(currentUser.GlobalIdentifier, currentUser);
                     }
+                    else
+                    {
+                        
+                    }
                     
+                }
+                else
+                {
+                    item.Value.usersDictionary.Remove(currentUser.GlobalIdentifier);
                 }
             }
         }
@@ -443,8 +452,12 @@ namespace ServerSide
                         currentMessage = JsonConvert.DeserializeObject<Message>(strAnswer);
                         if(currentMessage.MessageType == Message.Type.Text)
                         {
-                            NetworkStream.AssignUserToChat(currentUser, currentMessage);
                             NetworkStream.SendUserMessagesObject(currentUser.Username, currentMessage);
+                        }
+                        if(currentMessage.MessageType == Message.Type.Join)
+                        {
+                            NetworkStream.AssignUserToChat(currentUser, currentMessage);
+                            //NetworkStream.SendServerMessagesObject(currentMessage);
                         }
                         if(currentMessage.MessageType == Message.Type.Room)
                         {
