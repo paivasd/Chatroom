@@ -15,6 +15,8 @@ namespace ClientSide
 
         public Guid GlobalIdentifier { get; set; }
 
+        public Guid ChatRoomIdentifier { get; set; }
+
         public override string ToString()
         {
             return Username;

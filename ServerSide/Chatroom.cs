@@ -22,9 +22,10 @@ namespace ServerSide
         public string ChatName { get; set; }
         public Guid Identifier { get; set; }
 
-        public Dictionary<Guid, User> chatRoomUsers;
-
         public Type type { get; set; }
+
+        //public List<Guid> usersGuid = new List<Guid>();
+        public Dictionary<Guid, User> usersDictionary = new Dictionary<Guid, User>();
 
         public enum Type
         {

@@ -14,7 +14,7 @@ namespace ServerSide
 
         public Guid GlobalIdentifier { get; set; }
 
-        public Chatroom CurrentChat { get; set; }
+        public Guid CurrentChat { get; set; }
 
         public override string ToString()
         {

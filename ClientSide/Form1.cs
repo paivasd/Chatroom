@@ -53,8 +53,11 @@ namespace ClientSide
         private TcpClient _tcpClient;
         private User x;
         private Chatroom currentChatRoom;
-        private Dictionary<Guid, Chatroom> dictionaryChatRoom;
+        private Dictionary<Guid, string> dictionaryChatRoom;
+        private Dictionary<Chatroom, Guid> dictionaryChatRoomV2;
+        private List<Guid> usersGuid;
         private Message message;
+        private Guid messageGuid;
         enum Type
         {
             Text,
@@ -75,7 +78,9 @@ namespace ClientSide
         public Form1()
         {
             InitializeComponent();
-            dictionaryChatRoom = new Dictionary<Guid, Chatroom>();
+            dictionaryChatRoom = new Dictionary<Guid, string>();
+            dictionaryChatRoomV2 = new Dictionary<Chatroom, Guid>();
+           
 
             
 
@@ -95,11 +100,12 @@ namespace ClientSide
                 x = new User();
                 x.Username = nickBox.Text;
                 x.GlobalIdentifier = Guid.NewGuid();
+                
 
                 ipBox.Enabled = false;
                 nickBox.Enabled = false;
-                messageBox.Enabled = true;
-                sendButton.Enabled = true;
+                //messageBox.Enabled = true;
+                //sendButton.Enabled = true;
                 connectButton.Text = "Disconnected";
 
                 
@@ -147,6 +153,31 @@ namespace ClientSide
             while (connected)
             {
                 string response = sr.ReadLine();
+                if (response != "")
+                {
+                    message = JsonConvert.DeserializeObject<Message>(response);
+                    if (message.MessageType == Message.Type.Text)
+                    {
+                        this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { message.UserName +" said: " + message.MessageBody });
+                    }
+                    if(message.MessageType == Message.Type.Server)
+                    {
+                        this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { "Server said: " + message.MessageBody });
+                    }
+                    if(message.MessageType == Message.Type.Room)
+                    {
+                        dictionaryChatRoom = JsonConvert.DeserializeObject<Dictionary<Guid, string>>(message.MessageBody);
+                        foreach(KeyValuePair<Guid, string> item in dictionaryChatRoom)
+                        {
+                            Chatroom auxRoom = new Chatroom();
+                            auxRoom.Identifier = item.Key;
+                            auxRoom.ChatName = item.Value;
+                            dictionaryChatRoomV2.Add(auxRoom, auxRoom.Identifier);
+                        }
+                    }
+                }
+                
+
                 //Message message = new Message();
                 //try
                 //{
@@ -175,7 +206,7 @@ namespace ClientSide
                 //    MessageBox.Show("Error : " + ex.Message, "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 //}
 
-               this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { response });
+               //this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { response });
 
                 //try
                 //{
@@ -211,7 +242,18 @@ namespace ClientSide
         {
             if (messageBox.Lines.Length >= 1)
             {
-                sw.WriteLine(messageBox.Text);
+                // MESSAGE OBJECT //
+                message = new Message();
+                message.MessageBody = messageBox.Text;
+                message.MessageType = Message.Type.Text;
+                message.chatGuid = messageGuid;
+                message.userGuid = x.GlobalIdentifier;
+                message.UserName = x.Username;
+                string json;
+                json = JsonConvert.SerializeObject(message);
+
+                //sw.WriteLine(messageBox.Text);
+                sw.WriteLine(json);
                 sw.Flush();
                 messageBox.Lines = null;
             }
@@ -276,40 +318,78 @@ namespace ClientSide
 
         private void button1_Click_1(object sender, EventArgs e)
         {
+            messageGuid = AssignMessageId();
+            SendJoinMessage();
+            messageBox.Enabled = true;
+            sendButton.Enabled = true;
+            chatBox.Enabled = true;
+            //string curItem = listBox1.SelectedItem.ToString();
+
+            //foreach (KeyValuePair<Chatroom, Guid> item in dictionaryChatRoomV2)
+            //{
+            //    if (item.Key.ChatName == curItem)
+            //    {
+            //        item.Key.usersGuid.Add(x.GlobalIdentifier);
+
+            //        button1.Enabled = false;
+            //        messageBox.Enabled = true;
+            //        sendButton.Enabled = true;
+            //        chatBox.Enabled = true;
+            //        message.chatGuid = item.Key.Identifier;
+
+
+
+            //    }
+            //}
+            //sw.Flush();
+
+
+
+        }
+        private void SendJoinMessage()
+        {
+                // MESSAGE OBJECT //
+                message = new Message();
+                message.MessageBody = null;
+                message.MessageType = Message.Type.Join;
+                message.chatGuid = messageGuid;
+                message.userGuid = x.GlobalIdentifier;
+                string json;
+                json = JsonConvert.SerializeObject(message);
+
+                //sw.WriteLine(messageBox.Text);
+                sw.WriteLine(json);
+                sw.Flush();
+        }
+        
+        private Guid AssignMessageId()
+        {
             string curItem = listBox1.SelectedItem.ToString();
-            if(dictionaryChatRoom.Count == 0)
+
+            foreach (KeyValuePair<Chatroom, Guid> item in dictionaryChatRoomV2)
             {
-                currentChatRoom = new Chatroom();
-                currentChatRoom.ChatName = curItem;
-                currentChatRoom.Identifier = Guid.NewGuid();
-                currentChatRoom.chatRoomUsers.Add(x.GlobalIdentifier, x);
-                MessageBox.Show(currentChatRoom.Identifier.ToString());
-            }
-            else
-            {
-                foreach (KeyValuePair<Guid, Chatroom> entry in dictionaryChatRoom)
+                if (item.Key.ChatName == curItem)
                 {
-                    if (curItem != entry.Value.ChatName.ToString())
-                    {
-                        currentChatRoom = new Chatroom();
-                        currentChatRoom.ChatName = curItem;
-                        currentChatRoom.Identifier = Guid.NewGuid();
-                        currentChatRoom.chatRoomUsers.Add(x.GlobalIdentifier, x);
-                        MessageBox.Show(currentChatRoom.Identifier.ToString());
-                    }
-                    else
-                    {
-                        if (!currentChatRoom.chatRoomUsers.ContainsKey(x.GlobalIdentifier))
-                        {
-                            currentChatRoom.chatRoomUsers.Add(x.GlobalIdentifier, x);
-                            MessageBox.Show(currentChatRoom.Identifier.ToString());
-                        }
+                    item.Key.usersGuid.Add(x.GlobalIdentifier);
 
-                    }
+                    //button1.Enabled = false;
+                    
+                    messageGuid = item.Key.Identifier;
+
+                    break;
+
                 }
+                //else
+                //{
+                //    MessageBox.Show("Please choose a room");
+                //    messageGuid = Guid.Empty;
+                //}
             }
-            
-
+            if(messageGuid == Guid.Empty)
+            {
+                MessageBox.Show("Please choose a room");
+            }
+            return messageGuid;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -320,11 +400,17 @@ namespace ClientSide
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             
+            
 
-           //currentRoom.chatRoomUsers.Add(x.GlobalIdentifier, x);
+            //currentRoom.chatRoomUsers.Add(x.GlobalIdentifier, x);
         }
 
         private void CheckUserInChatRoom()
+        {
+
+        }
+
+        private void chatBox_TextChanged(object sender, EventArgs e)
         {
 
         }
