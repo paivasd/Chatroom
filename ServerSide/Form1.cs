@@ -14,11 +14,37 @@ namespace ServerSide
     public partial class Form1 : Form
     {
         private delegate void UpdateStatusCallback(string strMessage);
+        private bool _dragging;
+        private Point _offset;
+
 
         public Form1()
         {
             InitializeComponent();
         }
+
+
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_dragging)
+            {
+                Point currentScreenPos = PointToScreen(e.Location);
+                Location = new Point
+                    (currentScreenPos.X - _offset.X,
+                     currentScreenPos.Y - _offset.Y);
+            }
+        }
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+            _offset.X = e.X;
+            _offset.Y = e.Y;
+            _dragging = true;
+        }
+        private void Form1_MouseUp(object sender, MouseEventArgs e)
+        {
+            _dragging = false;
+        }
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -72,6 +98,11 @@ namespace ServerSide
                 }
             }
             return "127.0.0.1";
+        }
+
+        private void iconButton1_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

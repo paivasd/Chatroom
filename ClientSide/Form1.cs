@@ -47,6 +47,10 @@ namespace ClientSide
          * AS SALAS TÊM QUE TER UMA LISTA DE UTILIZADORES CONECTADOS.
          * QUANDO O UTILIZADOR ESCOLHE A SALA, O QUE ACONTECE? CLIENTE INFORMA SERVIDOR E SERVIDOR ADICIONA O _TCPCLIENT ÀQUELA SALA?
          */
+
+        private bool _dragging;
+        private Point _offset;
+
         public static string jsonTest = "";
         private StreamWriter sw;
         private StreamReader sr;
@@ -81,14 +85,43 @@ namespace ClientSide
             InitializeComponent();
             dictionaryChatRoom = new Dictionary<Guid, string>();
             dictionaryChatRoomV2 = new Dictionary<Chatroom, Guid>();
-            messageBox.Enabled = true;
-            sendButton.Enabled = true;
-            chatBox.Enabled = true;
+            //messageBox.Enabled = true;
+            //sendButton.Enabled = true;
+            //chatBox.Enabled = true;
             jsonTest = LoginPage.jsonTest;
+            IpText.Text = LoginPage.ipText;
+            YourNick.Text = LoginPage.userText;
 
 
 
 
+        }
+
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_dragging)
+            {
+                Point currentScreenPos = PointToScreen(e.Location);
+                Location = new Point
+                    (currentScreenPos.X - _offset.X,
+                     currentScreenPos.Y - _offset.Y);
+            }
+        }
+
+
+
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+            _offset.X = e.X;
+            _offset.Y = e.Y;
+            _dragging = true;
+        }
+
+
+
+        private void Form1_MouseUp(object sender, MouseEventArgs e)
+        {
+            _dragging = false;
         }
 
         private void Start()
@@ -96,7 +129,7 @@ namespace ClientSide
             try
             {
                 
-                 _ip = IPAddress.Parse(ipBox.Text);
+                 _ip = IPAddress.Parse(IpText.Text);
                 _tcpClient = new TcpClient();
                 _tcpClient.Connect(_ip, 9000);
 
@@ -108,13 +141,16 @@ namespace ClientSide
                 /* = JsonConvert.DeserializeObject<User>(jsonTest);*/
 
 
-                ipBox.Enabled = false;
-                nickBox.Enabled = false;
+                //ipBox.Enabled = false;
+                //nickBox.Enabled = false;
                 //messageBox.Enabled = true;
                 //sendButton.Enabled = true;
                 connectButton.Text = "Disconnected";
+                listBox1.Enabled = true;
+                button1.Enabled = true;
 
-                
+
+
                 sw = new StreamWriter(_tcpClient.GetStream());
                 //string json = JsonConvert.SerializeObject(x);
                 //string json2 = JsonConvert.SerializeObject(dictionaryChatRoom);
@@ -122,6 +158,8 @@ namespace ClientSide
                 //sw.WriteLine(json2);
                 //sw.WriteLine(json2);
                 sw.Flush();
+
+
 
                 //Initialize thread
                 thrMessage = new Thread(new ThreadStart(Receive));
@@ -142,7 +180,8 @@ namespace ClientSide
             if (connectionResponse[0] == '1')
             {
                 // update to inform we connect
-                this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { "You successfully connected to the server" });
+                this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { "You successfully connected to the server. Please choose a room." });
+               
             }
             else // if the first char is not 1, it means the connection failed
             {
@@ -273,8 +312,8 @@ namespace ClientSide
             chatBox.AppendText(diff + "\r\n");
           
 
-            ipBox.Enabled = true;
-            nickBox.Enabled = true;
+            //ipBox.Enabled = true;
+            //nickBox.Enabled = true;
             messageBox.Enabled = false;
             sendButton.Enabled = false;
             connectButton.Text = "Connected";
@@ -418,6 +457,21 @@ namespace ClientSide
         }
 
         private void chatBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void IpText_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void YourNick_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
         {
 
         }

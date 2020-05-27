@@ -32,6 +32,12 @@
             this.iconButton2 = new FontAwesome.Sharp.IconButton();
             this.iconButton3 = new FontAwesome.Sharp.IconButton();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.portBox = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.ipBox = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.panel4 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
             this.iconButton4 = new FontAwesome.Sharp.IconButton();
             this.passwordBox = new System.Windows.Forms.TextBox();
@@ -41,12 +47,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.iconPictureBox1 = new FontAwesome.Sharp.IconPictureBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.ipBox = new System.Windows.Forms.TextBox();
-            this.panel4 = new System.Windows.Forms.Panel();
-            this.portBox = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.panel5 = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.iconPictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -133,6 +133,68 @@
             this.panel1.Size = new System.Drawing.Size(319, 512);
             this.panel1.TabIndex = 3;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LoginPage_MouseUp);
+            // 
+            // portBox
+            // 
+            this.portBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(60)))));
+            this.portBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.portBox.ForeColor = System.Drawing.Color.White;
+            this.portBox.Location = new System.Drawing.Point(201, 343);
+            this.portBox.Name = "portBox";
+            this.portBox.Size = new System.Drawing.Size(70, 13);
+            this.portBox.TabIndex = 14;
+            this.portBox.Text = "9000";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.ForeColor = System.Drawing.Color.White;
+            this.label5.Location = new System.Drawing.Point(167, 342);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(28, 14);
+            this.label5.TabIndex = 15;
+            this.label5.Text = "Port";
+            // 
+            // panel5
+            // 
+            this.panel5.BackColor = System.Drawing.Color.DimGray;
+            this.panel5.Location = new System.Drawing.Point(201, 359);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(30, 1);
+            this.panel5.TabIndex = 13;
+            // 
+            // ipBox
+            // 
+            this.ipBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(60)))));
+            this.ipBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ipBox.ForeColor = System.Drawing.Color.White;
+            this.ipBox.Location = new System.Drawing.Point(87, 343);
+            this.ipBox.Name = "ipBox";
+            this.ipBox.Size = new System.Drawing.Size(150, 13);
+            this.ipBox.TabIndex = 11;
+            this.ipBox.Text = "192.168.56.1";
+            this.ipBox.TextChanged += new System.EventHandler(this.ipBox_TextChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.ForeColor = System.Drawing.Color.White;
+            this.label4.Location = new System.Drawing.Point(26, 342);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(50, 14);
+            this.label4.TabIndex = 12;
+            this.label4.Text = "ServerIP";
+            // 
+            // panel4
+            // 
+            this.panel4.BackColor = System.Drawing.Color.DimGray;
+            this.panel4.Location = new System.Drawing.Point(84, 359);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(80, 1);
+            this.panel4.TabIndex = 10;
             // 
             // label3
             // 
@@ -167,10 +229,12 @@
             // 
             this.passwordBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(60)))));
             this.passwordBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.passwordBox.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.passwordBox.ForeColor = System.Drawing.Color.White;
-            this.passwordBox.Location = new System.Drawing.Point(29, 296);
+            this.passwordBox.Location = new System.Drawing.Point(29, 294);
             this.passwordBox.Name = "passwordBox";
-            this.passwordBox.Size = new System.Drawing.Size(215, 13);
+            this.passwordBox.PasswordChar = '*';
+            this.passwordBox.Size = new System.Drawing.Size(215, 16);
             this.passwordBox.TabIndex = 9;
             // 
             // panel3
@@ -185,10 +249,11 @@
             // 
             this.userNameBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(60)))));
             this.userNameBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.userNameBox.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.userNameBox.ForeColor = System.Drawing.Color.White;
-            this.userNameBox.Location = new System.Drawing.Point(29, 235);
+            this.userNameBox.Location = new System.Drawing.Point(29, 232);
             this.userNameBox.Name = "userNameBox";
-            this.userNameBox.Size = new System.Drawing.Size(215, 13);
+            this.userNameBox.Size = new System.Drawing.Size(215, 16);
             this.userNameBox.TabIndex = 7;
             this.userNameBox.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
@@ -236,66 +301,6 @@
             this.iconPictureBox1.TabIndex = 3;
             this.iconPictureBox1.TabStop = false;
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.ForeColor = System.Drawing.Color.White;
-            this.label4.Location = new System.Drawing.Point(26, 342);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(50, 14);
-            this.label4.TabIndex = 12;
-            this.label4.Text = "ServerIP";
-            // 
-            // ipBox
-            // 
-            this.ipBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(60)))));
-            this.ipBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.ipBox.ForeColor = System.Drawing.Color.White;
-            this.ipBox.Location = new System.Drawing.Point(87, 343);
-            this.ipBox.Name = "ipBox";
-            this.ipBox.Size = new System.Drawing.Size(150, 13);
-            this.ipBox.TabIndex = 11;
-            this.ipBox.Text = "192.168.56.1";
-            // 
-            // panel4
-            // 
-            this.panel4.BackColor = System.Drawing.Color.DimGray;
-            this.panel4.Location = new System.Drawing.Point(84, 359);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(80, 1);
-            this.panel4.TabIndex = 10;
-            // 
-            // portBox
-            // 
-            this.portBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(60)))));
-            this.portBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.portBox.ForeColor = System.Drawing.Color.White;
-            this.portBox.Location = new System.Drawing.Point(201, 343);
-            this.portBox.Name = "portBox";
-            this.portBox.Size = new System.Drawing.Size(70, 13);
-            this.portBox.TabIndex = 14;
-            this.portBox.Text = "9000";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.ForeColor = System.Drawing.Color.White;
-            this.label5.Location = new System.Drawing.Point(167, 342);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(28, 14);
-            this.label5.TabIndex = 15;
-            this.label5.Text = "Port";
-            // 
-            // panel5
-            // 
-            this.panel5.BackColor = System.Drawing.Color.DimGray;
-            this.panel5.Location = new System.Drawing.Point(201, 359);
-            this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(30, 1);
-            this.panel5.TabIndex = 13;
-            // 
             // LoginPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -310,6 +315,9 @@
             this.Text = "LoginPage";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LoginPage_MouseUp);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LoginPage_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LoginPage_MouseMove);
             ((System.ComponentModel.ISupportInitialize)(this.iconPictureBox1)).EndInit();
             this.ResumeLayout(false);
 

@@ -18,6 +18,8 @@ namespace ClientSide
     public partial class LoginPage : Form
     {
         public static string jsonTest;
+        public static string ipText;
+        public static string userText;
         User currentUser;
         IPAddress _ip;
         TcpClient _tcpClient;
@@ -26,6 +28,11 @@ namespace ClientSide
         StreamReader sr;
         Thread thrMessage;
         Message message;
+        private bool _dragging;
+        private Point _offset;
+
+
+
 
         public LoginPage()
         {
@@ -39,9 +46,30 @@ namespace ClientSide
             //iconButton3.IconColor = myColor;
         }
 
+        private void LoginPage_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_dragging)
+            {
+                Point currentScreenPos = PointToScreen(e.Location);
+                Location = new Point
+                    (currentScreenPos.X - _offset.X,
+                     currentScreenPos.Y - _offset.Y);
+            }
+        }
+        private void LoginPage_MouseDown(object sender, MouseEventArgs e)
+        {
+            _offset.X = e.X;
+            _offset.Y = e.Y;
+            _dragging = true;
+        }
+        private void LoginPage_MouseUp(object sender, MouseEventArgs e)
+        {
+            _dragging = false;
+        }
+
         private void iconButton1_Click(object sender, EventArgs e)
         {
-
+            Close();
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -70,6 +98,9 @@ namespace ClientSide
         {
             try
             {
+                ipText = ipBox.Text;
+                userText = userNameBox.Text;
+
 
                 _ip = IPAddress.Parse(ipBox.Text);
                 _tcpClient = new TcpClient();
@@ -178,6 +209,10 @@ namespace ClientSide
             _tcpClient.Close();
         }
 
+        private void ipBox_TextChanged(object sender, EventArgs e)
+        {
 
+        }
     }
+
 }

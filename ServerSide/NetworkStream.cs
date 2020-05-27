@@ -574,7 +574,7 @@ namespace ServerSide
                     CloseConnection();
                     return;
                 }
-                //
+                
                 try
                 {               // USER MESSAGE //
                     while ((strAnswer = sr.ReadLine()) != "")
