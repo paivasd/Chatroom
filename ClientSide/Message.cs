@@ -22,7 +22,9 @@ namespace ClientSide
             Room,
             Server,
             Guid,
-            Join
+            Join,
+            Register,
+            SuccessfulLogin
         }
     }
 }

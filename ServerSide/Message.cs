@@ -34,7 +34,9 @@ namespace ServerSide
             Room,
             Server,
             Guid,
-            Join
+            Join,
+            Register,
+            SuccessfulLogin
         }
 
 

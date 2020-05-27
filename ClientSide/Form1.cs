@@ -47,7 +47,7 @@ namespace ClientSide
          * AS SALAS TÊM QUE TER UMA LISTA DE UTILIZADORES CONECTADOS.
          * QUANDO O UTILIZADOR ESCOLHE A SALA, O QUE ACONTECE? CLIENTE INFORMA SERVIDOR E SERVIDOR ADICIONA O _TCPCLIENT ÀQUELA SALA?
          */
-
+        public static string jsonTest = "";
         private StreamWriter sw;
         private StreamReader sr;
         private TcpClient _tcpClient;
@@ -75,13 +75,19 @@ namespace ClientSide
         private IPAddress _ip;
         private bool connected;
 
+
         public Form1()
         {
             InitializeComponent();
             dictionaryChatRoom = new Dictionary<Guid, string>();
             dictionaryChatRoomV2 = new Dictionary<Chatroom, Guid>();
+            messageBox.Enabled = true;
+            sendButton.Enabled = true;
+            chatBox.Enabled = true;
+            jsonTest = LoginPage.jsonTest;
 
-            
+
+
 
         }
 
@@ -96,10 +102,11 @@ namespace ClientSide
 
                 connected = true;
 
-                x = new User();
-                x.Username = nickBox.Text;
-                x.GlobalIdentifier = Guid.NewGuid();
-                
+                //x = new User();
+                //x.Username = nickBox.Text;
+                //x.GlobalIdentifier = Guid.NewGuid();
+                /* = JsonConvert.DeserializeObject<User>(jsonTest);*/
+
 
                 ipBox.Enabled = false;
                 nickBox.Enabled = false;
@@ -109,9 +116,9 @@ namespace ClientSide
 
                 
                 sw = new StreamWriter(_tcpClient.GetStream());
-                string json = JsonConvert.SerializeObject(x);
+                //string json = JsonConvert.SerializeObject(x);
                 //string json2 = JsonConvert.SerializeObject(dictionaryChatRoom);
-                sw.WriteLine(json); // // // // // // // // // // // dá para passar objetos tbm
+                sw.WriteLine(jsonTest); // // // // // // // // // // // dá para passar objetos tbm
                 //sw.WriteLine(json2);
                 //sw.WriteLine(json2);
                 sw.Flush();
@@ -393,7 +400,8 @@ namespace ClientSide
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            jsonTest = LoginPage.jsonTest;
+            x = JsonConvert.DeserializeObject<User>(jsonTest);
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)

@@ -35,7 +35,10 @@ namespace ServerSide
     class NetworkStream
     {
         //Dictionary
+        public static Dictionary<Guid, string> dictionaryUserPassword = new Dictionary<Guid, string>();
+        public static Dictionary<string, string> dictionaryUserPasswordPlain = new Dictionary<string, string>();
         public static Dictionary<Guid, User> dictionaryUsers = new Dictionary<Guid, User>();
+        public static Dictionary<string, User> dictionaryUserNameUser = new Dictionary<string, User>();
         public static Dictionary<User, Guid> dictionaryConnections = new Dictionary<User, Guid>();
         public static Dictionary<Chatroom, Guid> dictionaryChatRoom = new Dictionary<Chatroom, Guid>();
         public static Dictionary<Guid, Chatroom> dictionaryChatRoomV3 = new Dictionary<Guid, Chatroom>();
@@ -70,7 +73,7 @@ namespace ServerSide
                 Chatroom chat2 = new Chatroom("EDJD");
                 dictionaryChatRoomV2.Add(chat1.Identifier, chat1.ChatName);
                 dictionaryChatRoomV2.Add(chat2.Identifier, chat2.ChatName);
-               
+
 
                 dictionaryChatRoom.Add(chat1, chat1.Identifier);
                 dictionaryChatRoom.Add(chat2, chat2.Identifier);
@@ -96,7 +99,7 @@ namespace ServerSide
                 throw ex;
             }
         }
-       
+
         private void ActiveListening()
         {
             while (serverUp == true)
@@ -111,8 +114,9 @@ namespace ServerSide
         {
 
             //DICTIONARIES
-            dictionaryUsers.Add(currentUser.GlobalIdentifier, currentUser);
+           // dictionaryUsers.Add(currentUser.GlobalIdentifier, currentUser);
             dictionaryConnections.Add(currentUser, currentUser.GlobalIdentifier);
+
 
             Message currentMessage = new Message();
             currentMessage.MessageBody = dictionaryUsers[currentUser.GlobalIdentifier] + " connected to server.";
@@ -120,7 +124,7 @@ namespace ServerSide
 
             //SendServerMessages(dictionaryUsers[currentUser.GlobalIdentifier] + " connected to server");
             SendServerMessagesObject(currentMessage); // TÁ CERTO
-                                                                                                             // SÓ FALTA ARRANJAR
+                                                      // SÓ FALTA ARRANJAR
 
         }
 
@@ -288,7 +292,7 @@ namespace ServerSide
             Chatroom aux;
             dictionaryChatRoomV3.TryGetValue(currentMessage.chatGuid, out aux);
 
-            e = new StatusChangedEventArgs( userName + " said: " + currentMessage.MessageBody.ToString() + " to " + aux.ChatName + " chatroom.");
+            e = new StatusChangedEventArgs(userName + " said: " + currentMessage.MessageBody.ToString() + " to " + aux.ChatName + " chatroom.");
             OnStatusChanged(e);
 
             string json;
@@ -325,18 +329,18 @@ namespace ServerSide
             currentUser.CurrentChat = currentMessage.chatGuid;
             foreach (KeyValuePair<Guid, Chatroom> item in dictionaryChatRoomV3)
             {
-                if(item.Key == currentMessage.chatGuid)
+                if (item.Key == currentMessage.chatGuid)
                 {
-                    if(!item.Value.usersDictionary.ContainsKey(currentUser.GlobalIdentifier))
+                    if (!item.Value.usersDictionary.ContainsKey(currentUser.GlobalIdentifier))
                     {
-                        
+
                         item.Value.usersDictionary.Add(currentUser.GlobalIdentifier, currentUser);
                     }
                     else
                     {
-                        
+
                     }
-                    
+
                 }
                 else
                 {
@@ -344,137 +348,268 @@ namespace ServerSide
                 }
             }
         }
-    }
 
-    class Connection
-    {
-        TcpClient _tcpClient;
-        string json;
-        User currentUser;
-        Chatroom currentChat;
-        Message currentMessage;
-
-
-        private Thread thrSender;
-        private StreamReader sr;
-        private StreamWriter sw;
-
-        private string strAnswer;
-
-        public Connection(TcpClient tcpClient)
+        public static void AddUserToUserDictionary(User currentUser)
         {
-            _tcpClient = tcpClient;
-            thrSender = new Thread(AcceptClient);
-            thrSender.Start();
-        }
-
-        private void CloseConnection()
-        {
-            _tcpClient.Close();
-            sr.Close();
-            sw.Close();
-        }
-
-        //private void SendChatRoomAvailable(Chatroom chatroom)
-        //{
-        //    StreamWriter sw;
-
-        //    string json = JsonConvert.SerializeObject(chatroom);
-        //    sw = new StreamWriter(currentUser.UserTcp.GetStream());
-        //    sw.WriteLine(json);
-        //}
-
-        private void AcceptClient()
-        {
-            sr = new StreamReader(_tcpClient.GetStream());
-            sw = new StreamWriter(_tcpClient.GetStream());
-
-                                  // PJ: A FAZER //
-            json = sr.ReadLine(); //RECEBER OBJETO USER SERIALIZADO
-                                  // FAZER DESERIALIZAÇÃO
-                                  // CRIAR NOVO OBJETO USER
-                                  // FAZER CENAS
-            currentUser = new User();
-            currentUser = JsonConvert.DeserializeObject<User>(json); // PAIVA: A FAZER //
-            currentUser.UserTcp = _tcpClient;                       // VERIFICAR EXISTENCIA NO DICIONARIO //
-                                                                    // SE EXISTIR, INFORMAR E FECHAR LIGAÇÃO
-            if (currentUser.Username != "")
+            if(dictionaryUsers.Count == 0)
             {
-                foreach (KeyValuePair<Guid, User> entry in NetworkStream.dictionaryUsers)
-                {
-                    if (currentUser.Username == entry.Value.Username)
-                    {
-                        sw.WriteLine("This user already exists.");
-                        sw.Flush();
-                        CloseConnection();
-                        return;
-                        
-                    }
+                currentUser.Registered = true;
+                dictionaryUsers.Add(currentUser.GlobalIdentifier, currentUser);
+                dictionaryUserNameUser.Add(currentUser.Username, currentUser);
 
-                }
-
-
-                //chatroom
-                sw.WriteLine("1");
-                sw.Flush();
-
-                sw.WriteLine(currentChat);
-                sw.Flush();
-
-                NetworkStream.AddUserDictionary(currentUser); 
-                                                                        // PAIVA: A FAZER //
-                                                                        // IMPLEMENTAR AS SALAS //
-                                                                        // ENVIAR DO SERVIDOR O GUID DAS SALAS E O CLIENT //
-                                                                        // DESERIALIZA E CONSTROI OS OBJETOS? DEVOLVE DPS LISTA COM OS USERS CONNECTADOS LA??????? //
-
-                NetworkStream.SendChatRoomForConnectedUser(currentUser);
-
+                dictionaryUserPasswordPlain.Add(currentUser.Username, currentUser.Password);
+                
             }
             else
             {
-                CloseConnection();
-                return;
-            }
-            //
-            try
-            {               // USER MESSAGE //
-                while ((strAnswer = sr.ReadLine()) != "")
+                foreach (KeyValuePair<Guid, User> item in dictionaryUsers) //criar dicionário
+                                                                           // temporário
                 {
-                    if (strAnswer == null)
+                    if (!dictionaryUsers.ContainsKey(currentUser.GlobalIdentifier))
                     {
-                        NetworkStream.DeleteUser(currentUser);
-                    }
-                    else
-                    {
-
-                        /// MENSAGEM OBJETO //
-
-                        currentMessage = JsonConvert.DeserializeObject<Message>(strAnswer);
-                        if(currentMessage.MessageType == Message.Type.Text)
-                        {
-                            NetworkStream.SendUserMessagesObject(currentUser.Username, currentMessage);
-                        }
-                        if(currentMessage.MessageType == Message.Type.Join)
-                        {
-                            NetworkStream.AssignUserToChat(currentUser, currentMessage);
-                            //NetworkStream.SendServerMessagesObject(currentMessage);
-                        }
-                        if(currentMessage.MessageType == Message.Type.Room)
-                        {
-                            
-                            //NetworkStream.AddUserToChatRoom(currentMessage);
-                        }
-
-
-                        // broadcast
-                        //NetworkStream.SendUserMessages(currentUser.Username, strAnswer);
-                       
+                        currentUser.Registered = true;
+                        //dictionaryUsers.Add(currentUser.GlobalIdentifier, currentUser);
+                        dictionaryUserNameUser.Add(currentUser.Username, currentUser);
+                        dictionaryUserPasswordPlain.Add(currentUser.Username, currentUser.Password);
                     }
                 }
             }
+            
+            //AddUserDictionary(currentUser);
+        }
+
+        public static User RetrieveUserFromDictionary(User currentUser)
+        {
+            foreach (KeyValuePair<string, string> item in dictionaryUserPasswordPlain)
+            {
+                if (item.Key == currentUser.Username && item.Value == currentUser.Password)
+                {
+                    //currentUser = dictionaryUsers[currentUser.GlobalIdentifier];
+                    currentUser = dictionaryUserNameUser[currentUser.Username];
+
+                    //if (!item.Value.usersDictionary.ContainsKey(currentUser.GlobalIdentifier))
+                    //{
+
+                    //    item.Value.usersDictionary.Add(currentUser.GlobalIdentifier, currentUser);
+                    //}
+                }
+                
+            }
+            return currentUser;
+        }
+
+        public static void SendUserInfo(User currentUser)
+        {
+            StreamWriter sw;
+            StatusChangedEventArgs e = new StatusChangedEventArgs("Server: Sent info");
+            OnStatusChanged(e);
+            try
+            {
+                TcpClient aux;
+                aux = currentUser.UserTcp;
+                currentUser.UserTcp = null;
+                string json = JsonConvert.SerializeObject(currentUser);
+                Message message = new Message();
+                message.MessageBody = json;
+                message.MessageType = Message.Type.SuccessfulLogin;
+                string _json = JsonConvert.SerializeObject(message);
+
+                sw = new StreamWriter(aux.GetStream());
+                sw.WriteLine(_json);
+                sw.Flush();
+                sw = null;
+            }
             catch
             {
-                NetworkStream.DeleteUser(currentUser);
+
+            }
+
+
+
+        }
+
+        class Connection
+        {
+            TcpClient _tcpClient;
+            string json;
+            User currentUser;
+            Chatroom currentChat;
+            Message currentMessage;
+
+
+            private Thread thrSender;
+            private StreamReader sr;
+            private StreamWriter sw;
+
+            private string strAnswer;
+
+            public Connection(TcpClient tcpClient)
+            {
+                _tcpClient = tcpClient;
+                thrSender = new Thread(AcceptClient);
+                thrSender.Start();
+            }
+
+            private void CloseConnection()
+            {
+                _tcpClient.Close();
+                sr.Close();
+                sw.Close();
+            }
+
+            //private void SendChatRoomAvailable(Chatroom chatroom)
+            //{
+            //    StreamWriter sw;
+
+            //    string json = JsonConvert.SerializeObject(chatroom);
+            //    sw = new StreamWriter(currentUser.UserTcp.GetStream());
+            //    sw.WriteLine(json);
+            //}
+
+            private void AcceptClient()
+            {
+                sr = new StreamReader(_tcpClient.GetStream());
+                sw = new StreamWriter(_tcpClient.GetStream());
+
+                // PJ: A FAZER //
+                json = sr.ReadLine(); //RECEBER OBJETO USER SERIALIZADO
+                                      // FAZER DESERIALIZAÇÃO
+                                      // CRIAR NOVO OBJETO USER
+                                      // FAZER CENAS
+                currentUser = new User();
+                currentUser = JsonConvert.DeserializeObject<User>(json); // PAIVA: A FAZER //
+                currentUser.UserTcp = _tcpClient;                       // VERIFICAR EXISTENCIA NO DICIONARIO //
+                                                                        // SE EXISTIR, INFORMAR E FECHAR LIGAÇÃO
+
+                //Fazer função para verificar se este user já existe!
+                //retornar com um bool para alterar o currentUser.Registered
+                if (currentUser.Username != "")
+                {
+                    if(currentUser.Registered == true)
+                    {
+                        foreach (KeyValuePair<string, string> item in dictionaryUserPasswordPlain)
+                        {
+                            if (currentUser.Username == item.Key && currentUser.Password == item.Value) //pq o GlobalIdentifier ainda é zero
+                            {
+                                sw.WriteLine("1");
+                                sw.Flush();
+                                currentUser = NetworkStream.RetrieveUserFromDictionary(currentUser);
+                                currentUser.UserTcp = _tcpClient;
+                                NetworkStream.SendUserInfo(currentUser);
+                                sw.Flush();
+                                currentUser.UserTcp = _tcpClient;
+                                NetworkStream.SendChatRoomForConnectedUser(currentUser);
+                                //sw.WriteLine("This user already exists.");
+                                //sw.Flush();
+                                //CloseConnection();
+                                //return;
+                            }
+                        }
+                        //foreach (KeyValuePair<Guid, User> entry in NetworkStream.dictionaryUsers) // não pode ser neste dicionário
+                        //{
+                        //    if (currentUser.GlobalIdentifier == entry.Key) //pq o GlobalIdentifier ainda é zero
+                        //    {
+                        //        sw.WriteLine("1");
+                        //        sw.Flush();
+                        //        currentUser = NetworkStream.RetrieveUserFromDictionary(currentUser);
+                        //        NetworkStream.SendUserInfo(currentUser);
+                        //        //sw.WriteLine("This user already exists.");
+                        //        //sw.Flush();
+                        //        //CloseConnection();
+                        //        //return;
+
+                        //    }
+
+                        //}
+                    }
+                    else if(currentUser.Registered == false)
+                    {
+                        sw.WriteLine("1");
+                        sw.Flush();
+                        NetworkStream.AddUserToUserDictionary(currentUser);
+                        NetworkStream.SendUserInfo(currentUser);
+                        currentUser.UserTcp = _tcpClient;
+                        sw.Flush();
+                        NetworkStream.SendChatRoomForConnectedUser(currentUser);
+
+                    }
+
+
+
+                    ////chatroom
+                    //sw.WriteLine("1");
+                    //sw.Flush();
+
+                    //sw.WriteLine(currentChat);
+                    //sw.Flush();
+
+                    //NetworkStream.AddUserDictionary(currentUser);
+
+                    //verify if user is registered before adding him
+                    // PAIVA: A FAZER //
+                    // IMPLEMENTAR AS SALAS //
+                    // ENVIAR DO SERVIDOR O GUID DAS SALAS E O CLIENT //
+                    // DESERIALIZA E CONSTROI OS OBJETOS? DEVOLVE DPS LISTA COM OS USERS CONNECTADOS LA??????? //
+
+                    //NetworkStream.SendChatRoomForConnectedUser(currentUser);
+
+                }
+                else
+                {
+                    CloseConnection();
+                    return;
+                }
+                //
+                try
+                {               // USER MESSAGE //
+                    while ((strAnswer = sr.ReadLine()) != "")
+                    {
+                        if (strAnswer == null)
+                        {
+                            NetworkStream.DeleteUser(currentUser);
+                        }
+                        else
+                        {
+
+                            /// MENSAGEM OBJETO //
+
+                            currentMessage = JsonConvert.DeserializeObject<Message>(strAnswer);
+                            if (currentMessage.MessageType == Message.Type.Text)
+                            {
+                                NetworkStream.SendUserMessagesObject(currentUser.Username, currentMessage);
+                            }
+                            if (currentMessage.MessageType == Message.Type.Join)
+                            {
+                                NetworkStream.AssignUserToChat(currentUser, currentMessage);
+                                //NetworkStream.SendServerMessagesObject(currentMessage);
+                            }
+                            if (currentMessage.MessageType == Message.Type.Room)
+                            {
+
+                                //NetworkStream.AddUserToChatRoom(currentMessage);
+                            }
+                            if (currentMessage.MessageType == Message.Type.Register)
+                            {
+                                NetworkStream.AddUserToUserDictionary(currentUser);
+                            }
+                            if (currentMessage.MessageType == Message.Type.SuccessfulLogin)
+                            {
+                                User aux = new User();
+                                aux = NetworkStream.RetrieveUserFromDictionary(currentUser);
+                                NetworkStream.SendUserInfo(currentUser);
+                            }
+
+
+                            // broadcast
+                            //NetworkStream.SendUserMessages(currentUser.Username, strAnswer);
+
+                        }
+                    }
+                }
+                catch
+                {
+                    NetworkStream.DeleteUser(currentUser);
+                }
             }
         }
     }
