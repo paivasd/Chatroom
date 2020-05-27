@@ -92,9 +92,10 @@ namespace ClientSide
                 sw.Flush();
 
                 //Initialize thread
-                this.Hide();
+                
                 thrMessage = new Thread(new ThreadStart(Receive));
                 thrMessage.Start();
+                this.Hide();
             }
             catch (Exception ex)
             {
@@ -120,6 +121,7 @@ namespace ClientSide
                         MessageBox.Show("Succesfull login!");
                         jsonTest = JsonConvert.SerializeObject(currentUser);
 
+                        
                         //Form1 form = new Form1();
                         //form.ShowDialog();
                         //this.Hide();
@@ -135,6 +137,7 @@ namespace ClientSide
                 //// update to inform we connect
                 //this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { "You successfully connected to the server" });
             }
+        
             Form1 form = new Form1();
             form.ShowDialog();
             //else // if the first char is not 1, it means the connection failed

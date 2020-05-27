@@ -36,10 +36,14 @@ namespace ServerSide
     {
         //Dictionary
         public static Dictionary<Guid, string> dictionaryUserPassword = new Dictionary<Guid, string>();
+
         public static Dictionary<string, string> dictionaryUserPasswordPlain = new Dictionary<string, string>();
-        public static Dictionary<Guid, User> dictionaryUsers = new Dictionary<Guid, User>();
+
         public static Dictionary<string, User> dictionaryUserNameUser = new Dictionary<string, User>();
+
         public static Dictionary<User, Guid> dictionaryConnections = new Dictionary<User, Guid>();
+        public static Dictionary<Guid, User> dictionaryUsers = new Dictionary<Guid, User>();
+
         public static Dictionary<Chatroom, Guid> dictionaryChatRoom = new Dictionary<Chatroom, Guid>();
         public static Dictionary<Guid, Chatroom> dictionaryChatRoomV3 = new Dictionary<Guid, Chatroom>();
         public static Dictionary<Guid, string> dictionaryChatRoomV2 = new Dictionary<Guid, string>();
@@ -71,6 +75,17 @@ namespace ServerSide
             {
                 Chatroom chat1 = new Chatroom("LESI"); // VERIFICAR ESTA ABORDAGEM, NÃO PARECE CORRETA.................
                 Chatroom chat2 = new Chatroom("EDJD");
+                User baseUser = new User();
+                baseUser.Username = "paiva";
+                baseUser.Password = "123";
+                baseUser.GlobalIdentifier = Guid.NewGuid();
+                baseUser.Registered = true;
+                baseUser.UserType = User.Type.Student;
+                dictionaryUserPasswordPlain.Add(baseUser.Username, baseUser.Password);
+                dictionaryUsers.Add(baseUser.GlobalIdentifier, baseUser);
+                dictionaryUserNameUser.Add(baseUser.Username, baseUser);
+
+
                 dictionaryChatRoomV2.Add(chat1.Identifier, chat1.ChatName);
                 dictionaryChatRoomV2.Add(chat2.Identifier, chat2.ChatName);
 

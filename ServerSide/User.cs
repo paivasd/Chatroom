@@ -11,10 +11,18 @@ namespace ServerSide
     {
         public string Username { get; set; }
         public TcpClient UserTcp { get; set; }
-        public string Password { get; set;}
+
+        public string Password { get; set; }
+
         public Guid GlobalIdentifier { get; set; }
 
+        public Guid ChatRoomIdentifier { get; set; }
+
         public Guid CurrentChat { get; set; }
+
+
+        public Type UserType { get; set; }
+        public Course CourseType { get; set; }
 
         public bool Registered { get; set; }
 
@@ -22,10 +30,18 @@ namespace ServerSide
         {
             return Username;
         }
+
         public enum Type
         {
             Student,
             Teacher
+        }
+        public enum Course
+        {
+            LESI,
+            EDJD,
+            EEC,
+
         }
     }
 }

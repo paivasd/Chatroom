@@ -17,6 +17,9 @@ namespace ClientSide
 
         public Guid GlobalIdentifier { get; set; }
 
+        public Guid CurrentChat { get; set; }
+
+
         public Guid ChatRoomIdentifier { get; set; }
 
         public Type UserType { get; set; }
