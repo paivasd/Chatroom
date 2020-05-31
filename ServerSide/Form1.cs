@@ -23,7 +23,7 @@ namespace ServerSide
             InitializeComponent();
         }
 
-
+        #region HANDLE WINDOW MOVEMENT
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
             if (_dragging)
@@ -44,7 +44,7 @@ namespace ServerSide
         {
             _dragging = false;
         }
-
+        #endregion
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -54,6 +54,8 @@ namespace ServerSide
                 string ip = GetIPAddress();
                 IPAddress _ipAddress = IPAddress.Parse(ip);
 
+                //New instance of NetworkStream, class that handles the
+                //connections.
                 NetworkStream instance = new NetworkStream(_ipAddress);
                 NetworkStream.StatusChanged += new StatusChangedEventHandler(socket_StatusChanged);
 
@@ -69,13 +71,14 @@ namespace ServerSide
         }
 
 
-
+        //Method for the delegate
         private void UpdateStatus(string strMessage)
         {
 
             logfileTextBox.AppendText(strMessage + "\r\n");
         }
 
+        //Method for the delegate
         public void socket_StatusChanged(object sender, StatusChangedEventArgs e)
         {
             this.Invoke(new UpdateStatusCallback(this.UpdateStatus), new object[] { e.EventMessage });
@@ -87,6 +90,8 @@ namespace ServerSide
 
         }
 
+
+        //Method used to retrieve the server local IP
         private string GetIPAddress()
         {
             IPAddress[] ips = Dns.GetHostAddresses(Dns.GetHostName());

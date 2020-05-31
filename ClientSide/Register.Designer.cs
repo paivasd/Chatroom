@@ -96,7 +96,6 @@
             this.label3.Size = new System.Drawing.Size(105, 19);
             this.label3.TabIndex = 18;
             this.label3.Text = "You\'re taking...";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // comboBox3
             // 
@@ -145,7 +144,6 @@
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(215, 21);
             this.comboBox1.TabIndex = 13;
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // label4
             // 
@@ -316,7 +314,6 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Register";
             this.Text = "Register";
-            this.Load += new System.EventHandler(this.Register_Load);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Register_MouseUp);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Register_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Register_MouseMove);

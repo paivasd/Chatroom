@@ -87,7 +87,6 @@
             this.iconButton2.TabIndex = 1;
             this.iconButton2.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.iconButton2.UseVisualStyleBackColor = false;
-            this.iconButton2.Click += new System.EventHandler(this.iconButton2_Click);
             // 
             // iconButton3
             // 
@@ -133,7 +132,6 @@
             this.panel1.Size = new System.Drawing.Size(319, 512);
             this.panel1.TabIndex = 3;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
-            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LoginPage_MouseUp);
             // 
             // portBox
             // 
@@ -175,7 +173,6 @@
             this.ipBox.Size = new System.Drawing.Size(150, 13);
             this.ipBox.TabIndex = 11;
             this.ipBox.Text = "192.168.56.1";
-            this.ipBox.TextChanged += new System.EventHandler(this.ipBox_TextChanged);
             // 
             // label4
             // 
@@ -255,7 +252,6 @@
             this.userNameBox.Name = "userNameBox";
             this.userNameBox.Size = new System.Drawing.Size(215, 16);
             this.userNameBox.TabIndex = 7;
-            this.userNameBox.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // panel2
             // 
@@ -313,11 +309,11 @@
             this.Name = "LoginPage";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "LoginPage";
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LoginPage_MouseUp);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LoginPage_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LoginPage_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LoginPage_MouseUp);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.iconPictureBox1)).EndInit();
             this.ResumeLayout(false);
 

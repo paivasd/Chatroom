@@ -39,6 +39,7 @@ namespace ClientSide
 
         }
 
+        #region HANDLE WINDOW MOVEMENT
         private void Register_MouseMove(object sender, MouseEventArgs e)
         {
             if (_dragging)
@@ -65,22 +66,7 @@ namespace ClientSide
         {
             _dragging = false;
         }
-
-
-        private void Register_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
+        #endregion
 
         private void iconButton4_Click(object sender, EventArgs e)
         {
@@ -117,10 +103,10 @@ namespace ClientSide
                 else
                 {
                     MessageBox.Show("Please choose a Course");
-                    //currentUser.UserType = textbox
 
                 }
 
+                 //Attempts the connection to the server
                  _ip = IPAddress.Parse(ipText);
                  _tcpClient = new TcpClient();
                  _tcpClient.Connect(_ip, 9000);
@@ -129,14 +115,12 @@ namespace ClientSide
 
                  currentUser.GlobalIdentifier = Guid.NewGuid();
                     
-
+                 //Open a StreamWriter
                  sw = new StreamWriter(_tcpClient.GetStream());
                  string json = JsonConvert.SerializeObject(currentUser);
 
-                    //string json2 = JsonConvert.SerializeObject(dictionaryChatRoom);
-                 sw.WriteLine(json); // // // // // // // // // // // dá para passar objetos tbm
-                                        //sw.WriteLine(json2);
-                                        //sw.WriteLine(json2);
+                 sw.WriteLine(json);
+
                  sw.Flush();
 
                 //Initialize thread
@@ -153,11 +137,16 @@ namespace ClientSide
 
         private void Receive()
         {
+            //Open a StreamReader to be able to fetch Server responses
             sr = new StreamReader(_tcpClient.GetStream());
+
+            //Fetch the server response
             string connectionResponse = sr.ReadLine();
 
+            //Flag we use on successful connection
             if (connectionResponse[0] == '1')
             {
+                //Reading line from StreamReader
                 string response = sr.ReadLine();
                 if (response != "")
                 {
@@ -174,35 +163,13 @@ namespace ClientSide
                     }
                 }
 
-                //// update to inform we connect
-                //this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { "You successfully connected to the server" });
+                
             }
-            else // if the first char is not 1, it means the connection failed
+            else 
             {
-                //string aux = "Not connected:  ";
-                //// why? answer starts in the 3rd character
-                //aux += connectionResponse.Substring(2, connectionResponse.Length - 2);
-
-                //// Aupdate textbox
-                //this.Invoke(new CloseConnectionCallBack(this.CloseConnection), new object[] { aux });
-                //return;
+                MessageBox.Show("Connection Error");
             }
 
-
-            //while (connected)
-            //{
-            //    string response = sr.ReadLine();
-            //    if (response != "")
-            //    {
-            //        message = JsonConvert.DeserializeObject<Message>(response);
-            //        if (message.MessageType == Message.Type.Register)
-            //        {
-            //            MessageBox.Show("Succesfully registered!");
-
-                        
-            //        }
-            //    }
-            //}
         }
 
         private void iconButton1_Click(object sender, EventArgs e)

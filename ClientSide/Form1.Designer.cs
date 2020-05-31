@@ -78,7 +78,6 @@
             this.chatBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.chatBox.Size = new System.Drawing.Size(374, 308);
             this.chatBox.TabIndex = 3;
-            this.chatBox.TextChanged += new System.EventHandler(this.chatBox_TextChanged);
             // 
             // messageBox
             // 
@@ -135,7 +134,6 @@
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(135, 308);
             this.listBox1.TabIndex = 9;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // button1
             // 
@@ -159,7 +157,6 @@
             this.YourNick.Name = "YourNick";
             this.YourNick.Size = new System.Drawing.Size(0, 13);
             this.YourNick.TabIndex = 11;
-            this.YourNick.Click += new System.EventHandler(this.YourNick_Click);
             // 
             // IpText
             // 
@@ -169,7 +166,6 @@
             this.IpText.Name = "IpText";
             this.IpText.Size = new System.Drawing.Size(0, 13);
             this.IpText.TabIndex = 12;
-            this.IpText.Click += new System.EventHandler(this.IpText_Click);
             // 
             // panel1
             // 
@@ -202,9 +198,9 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);

@@ -10,7 +10,19 @@ namespace ClientSide
 {
     class User
     {
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public User()
+        {
+
+        }
+
+        /// <summary>
+        /// Properties
+        /// </summary>
         public string Username { get; set; }
+
         public TcpClient UserTcp { get; set; }
 
         public string Password { get; set; }
@@ -19,18 +31,14 @@ namespace ClientSide
 
         public Guid CurrentChat { get; set; }
 
-
         public Guid ChatRoomIdentifier { get; set; }
 
         public Type UserType { get; set; }
+
         public Course CourseType {get; set;}
 
         public bool Registered { get; set; }
 
-        public override string ToString()
-        {
-            return Username;
-        }
 
         public enum Type
         {

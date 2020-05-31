@@ -36,17 +36,13 @@ namespace ClientSide
 
         public LoginPage()
         {
+
             InitializeComponent();
-            string hexColor = "#49D49D";
-
-            Color myColor = System.Drawing.ColorTranslator.FromHtml(hexColor);
-
-            ipText = ipBox.Text;
             //iconButton1.IconColor = myColor;
             //iconButton2.IconColor = myColor;
             //iconButton3.IconColor = myColor;
         }
-
+        #region HANDLE WINDOW MOVEMENT
         private void LoginPage_MouseMove(object sender, MouseEventArgs e)
         {
             if (_dragging)
@@ -67,42 +63,31 @@ namespace ClientSide
         {
             _dragging = false;
         }
+        #endregion
 
         private void iconButton1_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void iconButton2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void label3_Click(object sender, EventArgs e)
         {
+            ipText = ipBox.Text;
             Register form = new Register();
             form.ShowDialog();
+            
 
         }
 
         private void iconButton4_Click(object sender, EventArgs e)
         {
+            
             try
             {
                 ipText = ipBox.Text;
                 userText = userNameBox.Text;
 
-
+                //Attempts the connection to the server
                 _ip = IPAddress.Parse(ipBox.Text);
                 _tcpClient = new TcpClient();
                 _tcpClient.Connect(_ip, 9000);
@@ -114,13 +99,12 @@ namespace ClientSide
                 currentUser.Password = passwordBox.Text;
                 currentUser.Registered = true;
 
-
+                //Open a StreamWriter
                 sw = new StreamWriter(_tcpClient.GetStream());
                 string json = JsonConvert.SerializeObject(currentUser);
-                //string json2 = JsonConvert.SerializeObject(dictionaryChatRoom);
-                sw.WriteLine(json); // // // // // // // // // // // dá para passar objetos tbm
-                //sw.WriteLine(json2);
-                //sw.WriteLine(json2);
+
+                sw.WriteLine(json); 
+
                 sw.Flush();
 
                 //Initialize thread
@@ -137,80 +121,46 @@ namespace ClientSide
 
         private void Receive()
         {
+            //Open a StreamReader to be able to fetch Server responses
             sr = new StreamReader(_tcpClient.GetStream());
+            //Fetch the server response
             string connectionResponse = sr.ReadLine();
 
+            //Flag we use on successful connection
             if (connectionResponse[0] == '1')
             {
+                //Reading line from StreamReader
                 string response = sr.ReadLine();
                 if (response != "")
                 {
                     message = JsonConvert.DeserializeObject<Message>(response);
                     if (message.MessageType == Message.Type.SuccessfulLogin)
                     {
+                        //Deserialize into User object
                         currentUser = JsonConvert.DeserializeObject<User>(message.MessageBody);
-                        //deserializar para objecto retornado do servidor
+                        
                         MessageBox.Show("Succesfull login!");
                         jsonTest = JsonConvert.SerializeObject(currentUser);
 
                         
-                        //Form1 form = new Form1();
-                        //form.ShowDialog();
-                        //this.Hide();
-
+                       
 
 
 
 
                     }
                 }
-
-                
-                //// update to inform we connect
-                //this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { "You successfully connected to the server" });
+                Form1 form = new Form1();
+                form.ShowDialog();
             }
-        
-            Form1 form = new Form1();
-            form.ShowDialog();
-            //else // if the first char is not 1, it means the connection failed
-            //{
-            //    //string aux = "Not connected:  ";
-            //    //// why? answer starts in the 3rd character
-            //    //aux += connectionResponse.Substring(2, connectionResponse.Length - 2);
-
-            //    //// Aupdate textbox
-            //    //this.Invoke(new CloseConnectionCallBack(this.CloseConnection), new object[] { aux });
-            //    //return;
-            //}
-
-
-            //while (connected)
-            //{
-            //    string response = sr.ReadLine();
-            //    if (response != "")
-            //    {
-            //        message = JsonConvert.DeserializeObject<Message>(response);
-            //        //if (message.MessageType == Message.Type.SuccessLogin)
-            //        //{
-            //        //    MessageBox.Show("Succesfully registered!");
-
-
-            //        //}
-            //    }
-            //}
+            else
+            {
+                MessageBox.Show("Connection Error");
+            }
+            
         }
 
-
-        private void CloseConnection(string diff)
-        {
-            // Mostra o motivo porque a conexão encerrou
-            connected = false;
-            sw.Close();
-            sr.Close();
-            _tcpClient.Close();
-        }
-
-        private void ipBox_TextChanged(object sender, EventArgs e)
+        private void panel1_Paint(object sender, PaintEventArgs e)
         {
 
         }

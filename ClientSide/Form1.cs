@@ -68,11 +68,16 @@ namespace ClientSide
             Room,
         };
 
-        // Will handle textbox updates
+        /// <summary>
+        /// Delegate that will handle the textbox text changes
+        /// </summary>
+        /// <param name="message">Text to update</param>
         private delegate void UpdateLogCallBack(string message);
 
-        // 
-        // will handle disconnected state from thread
+        /// <summary>
+        /// Delegate that will handle the disconnected state from the thread, update textbox text
+        /// </summary>
+        /// <param name="aux">Text to update</param>
         private delegate void CloseConnectionCallBack(string aux);
 
         private Thread thrMessage;
@@ -85,9 +90,7 @@ namespace ClientSide
             InitializeComponent();
             dictionaryChatRoom = new Dictionary<Guid, string>();
             dictionaryChatRoomV2 = new Dictionary<Chatroom, Guid>();
-            //messageBox.Enabled = true;
-            //sendButton.Enabled = true;
-            //chatBox.Enabled = true;
+
             jsonTest = LoginPage.jsonTest;
             IpText.Text = LoginPage.ipText;
             YourNick.Text = LoginPage.userText;
@@ -97,6 +100,8 @@ namespace ClientSide
 
         }
 
+
+        #region HANDLE WINDOW MOVEMENT
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
             if (_dragging)
@@ -123,45 +128,36 @@ namespace ClientSide
         {
             _dragging = false;
         }
+        #endregion
+
 
         private void Start()
         {
             try
             {
-                
+                //Attempts the connection to the server
                  _ip = IPAddress.Parse(IpText.Text);
                 _tcpClient = new TcpClient();
                 _tcpClient.Connect(_ip, 9000);
 
                 connected = true;
 
-                //x = new User();
-                //x.Username = nickBox.Text;
-                //x.GlobalIdentifier = Guid.NewGuid();
-                /* = JsonConvert.DeserializeObject<User>(jsonTest);*/
-
-
-                //ipBox.Enabled = false;
-                //nickBox.Enabled = false;
-                //messageBox.Enabled = true;
-                //sendButton.Enabled = true;
+                //Unlock controls
                 connectButton.Text = "Disconnected";
                 listBox1.Enabled = true;
                 button1.Enabled = true;
 
 
-
+                //Open a StreamWriter 
                 sw = new StreamWriter(_tcpClient.GetStream());
-                //string json = JsonConvert.SerializeObject(x);
-                //string json2 = JsonConvert.SerializeObject(dictionaryChatRoom);
-                sw.WriteLine(jsonTest); // // // // // // // // // // // dá para passar objetos tbm
-                //sw.WriteLine(json2);
-                //sw.WriteLine(json2);
+
+                //So we can write to the server
+                sw.WriteLine(jsonTest);
+               
+                //Clear buffers
                 sw.Flush();
 
-
-
-                //Initialize thread
+                //Initialize the thread
                 thrMessage = new Thread(new ThreadStart(Receive));
                 thrMessage.Start();
             }
@@ -171,118 +167,87 @@ namespace ClientSide
             }
         }
 
+        /// <summary>
+        /// Method that handles the upcoming responses from the Server
+        /// </summary>
         private void Receive()
         {
            
+            //Open a StreamReader to be able to fetch Server responses
             sr = new StreamReader(_tcpClient.GetStream());
+
+            //Fetch the server response
             string connectionResponse = sr.ReadLine();
-            
+
+            //Flag we use on successful connection
             if (connectionResponse[0] == '1')
             {
-                // update to inform we connect
+                //Update textbox thru the delegate
                 this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { "You successfully connected to the server. Please choose a room." });
-               
-            }
-            else // if the first char is not 1, it means the connection failed
-            {
-                string aux = "Not connected:  ";
-                // why? answer starts in the 3rd character
-                aux += connectionResponse.Substring(2, connectionResponse.Length - 2);
 
-                // Aupdate textbox
+                while (connected)
+                {   
+                    try
+                    {
+                        //Reading line from StreamReader
+                        string response = sr.ReadLine();
+                        if (response != "")
+                        {
+                            //If response string is not empty, we deserialize the response into a Message object
+                            message = JsonConvert.DeserializeObject<Message>(response);
+
+                            //Depending on the Type of the Message object
+                            if (message.MessageType == Message.Type.Text)
+                            {
+                                this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { message.UserName + " said: " + message.MessageBody });
+                            }
+                            if (message.MessageType == Message.Type.Server)
+                            {
+                                this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { "Server said: " + message.MessageBody });
+                            }
+                            if (message.MessageType == Message.Type.Room) //If Type is Room, we populate our chatroom dictionary with the info
+                            {
+                                dictionaryChatRoom = JsonConvert.DeserializeObject<Dictionary<Guid, string>>(message.MessageBody);
+                                foreach (KeyValuePair<Guid, string> item in dictionaryChatRoom)
+                                {
+                                    Chatroom auxRoom = new Chatroom();
+                                    auxRoom.Identifier = item.Key;
+                                    auxRoom.ChatName = item.Value;
+                                    dictionaryChatRoomV2.Add(auxRoom, auxRoom.Identifier);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception Ex)
+                    {
+                        string aux = "Disconnected";
+                        this.Invoke(new CloseConnectionCallBack(this.CloseConnection), new object[] { aux });
+                        return;
+                    }
+                    
+                }
+
+            }
+            else //If the flag is not 1, it means the connection failed/User disconnected
+            {
+                string aux = "Disconnected";
+
+                //Update textbox thru the delegate
                 this.Invoke(new CloseConnectionCallBack(this.CloseConnection), new object[] { aux });
                 return;
             }
-
             
-            while (connected)
-            {
-                string response = sr.ReadLine();
-                if (response != "")
-                {
-                    message = JsonConvert.DeserializeObject<Message>(response);
-                    if (message.MessageType == Message.Type.Text)
-                    {
-                        this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { message.UserName +" said: " + message.MessageBody });
-                    }
-                    if(message.MessageType == Message.Type.Server)
-                    {
-                        this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { "Server said: " + message.MessageBody });
-                    }
-                    if(message.MessageType == Message.Type.Room)
-                    {
-                        dictionaryChatRoom = JsonConvert.DeserializeObject<Dictionary<Guid, string>>(message.MessageBody);
-                        foreach(KeyValuePair<Guid, string> item in dictionaryChatRoom)
-                        {
-                            Chatroom auxRoom = new Chatroom();
-                            auxRoom.Identifier = item.Key;
-                            auxRoom.ChatName = item.Value;
-                            dictionaryChatRoomV2.Add(auxRoom, auxRoom.Identifier);
-                        }
-                    }
-                }
-                
-
-                //Message message = new Message();
-                //try
-                //{
-                //    message = (Message)JsonConvert.DeserializeObject(response);
-                //    try
-                //    {
-                //        if ((int)message.type == 1)
-                //        {
-                //            dictionaryChatRoom = (Dictionary<Guid, Chatroom>)JsonConvert.DeserializeObject(response);
-                //            //currentChat = (Chatroom)JsonConvert.DeserializeObject(response);
-                //        }
-                //        else
-                //        {
-                //            return;
-                //        }
-                //    }
-                //    catch (Exception ex)
-                //    {
-
-                //        MessageBox.Show("Error : " + ex.Message, "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-
-                //    MessageBox.Show("Error : " + ex.Message, "Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //}
-
-               //this.Invoke(new UpdateLogCallBack(this.LogUpdate), new object[] { response });
-
-                //try
-                //{
-                //    currentChatRoom = (Chatroom)JsonConvert.DeserializeObject(response);
-                //    MessageBox.Show(currentChatRoom.ChatName + currentChatRoom.Identifier);
-                //}
-                //catch (Exception ex)
-                //{
-
-                //    MessageBox.Show("Error : " + ex.Message, "Failed Conversion JSON", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //}
-                //// exibe mensagems no Textbox
-                //this.Invoke(new UpdateLogCallBack(this.AtualizaLog), new object[] { response });
-            }
         }
 
+        //Method for the delegate
         private void LogUpdate(string message)
         {
             
             chatBox.AppendText(message + "\r\n");
         }
 
-        private void messageBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == (char)13)
-            {
-                SendMessage();
-            }
-        }
 
-       //method to send msg to server
+       //Method to send textbox message to server
         private void SendMessage()
         {
             if (messageBox.Lines.Length >= 1)
@@ -305,18 +270,15 @@ namespace ClientSide
             messageBox.Text = "";
         }
 
-        //close connection to serv
-        private void CloseConnection(string diff)
+        //Close the connection to the server.
+        private void CloseConnection(string message)
         {
-            // Mostra o motivo porque a conexão encerrou
-            chatBox.AppendText(diff + "\r\n");
-          
+            chatBox.AppendText(message + "\r\n");
 
-            //ipBox.Enabled = true;
-            //nickBox.Enabled = true;
+
             messageBox.Enabled = false;
             sendButton.Enabled = false;
-            connectButton.Text = "Connected";
+            connectButton.Text = "Connect";
 
             connected = false;
             sw.Close();
@@ -324,33 +286,15 @@ namespace ClientSide
             _tcpClient.Close();
         }
 
-        
-        public void OnApplicationExit(object sender, EventArgs e)
-        {
-            if (connected == true)
-            {
-                //close everything
-                connected = false;
-                sw.Close();
-                sr.Close();
-                _tcpClient.Close();
-            }
-        }
-
-        private void frmCliente_Load(object sender, EventArgs e)
-        {
-
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //if not connected, starts the connection method
-            //TESTE GIT
+            //If not connected, starts the connection method
             if (connected == false)
             {
                 Start();
             }
-            else //if connected, disconnects current connection
+            else //If connected, disconnects current connection
             {
                 CloseConnection("Disconnected");
             }
@@ -368,29 +312,11 @@ namespace ClientSide
             messageBox.Enabled = true;
             sendButton.Enabled = true;
             chatBox.Enabled = true;
-            //string curItem = listBox1.SelectedItem.ToString();
-
-            //foreach (KeyValuePair<Chatroom, Guid> item in dictionaryChatRoomV2)
-            //{
-            //    if (item.Key.ChatName == curItem)
-            //    {
-            //        item.Key.usersGuid.Add(x.GlobalIdentifier);
-
-            //        button1.Enabled = false;
-            //        messageBox.Enabled = true;
-            //        sendButton.Enabled = true;
-            //        chatBox.Enabled = true;
-            //        message.chatGuid = item.Key.Identifier;
-
-
-
-            //    }
-            //}
-            //sw.Flush();
-
 
 
         }
+        
+        //Method used to create a Message object to inform the Server we joined a chatroom.
         private void SendJoinMessage()
         {
                 // MESSAGE OBJECT //
@@ -407,6 +333,8 @@ namespace ClientSide
                 sw.Flush();
         }
         
+        //Method used to assign a message guid to match the chatroom guid that we want to chat to.
+        //Also adds the current user Guid to the chatroom user dictionary.
         private Guid AssignMessageId()
         {
             string curItem = listBox1.SelectedItem.ToString();
@@ -415,20 +343,16 @@ namespace ClientSide
             {
                 if (item.Key.ChatName == curItem)
                 {
-                    item.Key.usersGuid.Add(x.GlobalIdentifier);
+                    item.Key.usersGuid.Add(x.GlobalIdentifier); //not implemented
+                    //was to show a list of users in the chatroom clientside (????)
 
                     //button1.Enabled = false;
-                    
+
                     messageGuid = item.Key.Identifier;
 
                     break;
 
                 }
-                //else
-                //{
-                //    MessageBox.Show("Please choose a room");
-                //    messageGuid = Guid.Empty;
-                //}
             }
             if(messageGuid == Guid.Empty)
             {
@@ -441,34 +365,6 @@ namespace ClientSide
         {
             jsonTest = LoginPage.jsonTest;
             x = JsonConvert.DeserializeObject<User>(jsonTest);
-        }
-
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            
-            
-
-            //currentRoom.chatRoomUsers.Add(x.GlobalIdentifier, x);
-        }
-
-        private void CheckUserInChatRoom()
-        {
-
-        }
-
-        private void chatBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void IpText_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void YourNick_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
