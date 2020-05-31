@@ -41,6 +41,7 @@ namespace ClientSide
 
             Color myColor = System.Drawing.ColorTranslator.FromHtml(hexColor);
 
+            ipText = ipBox.Text;
             //iconButton1.IconColor = myColor;
             //iconButton2.IconColor = myColor;
             //iconButton3.IconColor = myColor;

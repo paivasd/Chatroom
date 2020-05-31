@@ -18,6 +18,7 @@ namespace ClientSide
     public partial class Register : Form
     {
         public static string jsonTest;
+        string ipText;
         User currentUser;
         IPAddress _ip;
         TcpClient _tcpClient;
@@ -27,10 +28,44 @@ namespace ClientSide
         Thread thrMessage;
         Message message;
 
+        private bool _dragging;
+        private Point _offset;
+
+
         public Register()
         {
             InitializeComponent();
+            ipText = LoginPage.ipText;
+
         }
+
+        private void Register_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_dragging)
+            {
+                Point currentScreenPos = PointToScreen(e.Location);
+                Location = new Point
+                    (currentScreenPos.X - _offset.X,
+                     currentScreenPos.Y - _offset.Y);
+            }
+        }
+
+
+
+        private void Register_MouseDown(object sender, MouseEventArgs e)
+        {
+            _offset.X = e.X;
+            _offset.Y = e.Y;
+            _dragging = true;
+        }
+
+
+
+        private void Register_MouseUp(object sender, MouseEventArgs e)
+        {
+            _dragging = false;
+        }
+
 
         private void Register_Load(object sender, EventArgs e)
         {
@@ -86,7 +121,7 @@ namespace ClientSide
 
                 }
 
-                 _ip = IPAddress.Parse("192.168.56.1");
+                 _ip = IPAddress.Parse(ipText);
                  _tcpClient = new TcpClient();
                  _tcpClient.Connect(_ip, 9000);
 
@@ -173,6 +208,11 @@ namespace ClientSide
         private void iconButton1_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

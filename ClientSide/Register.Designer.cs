@@ -76,6 +76,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(319, 610);
             this.panel1.TabIndex = 4;
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // panel5
             // 
@@ -316,6 +317,9 @@
             this.Name = "Register";
             this.Text = "Register";
             this.Load += new System.EventHandler(this.Register_Load);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Register_MouseUp);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Register_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Register_MouseMove);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.iconPictureBox1)).EndInit();

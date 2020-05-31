@@ -267,37 +267,37 @@ namespace ServerSide
         }
 
         ////VERIFICAR SE NÃO PODEMOS REFATORAR ESTE MÉTODO E O DE CIMA////////////////
-        public static void SendUserMessages(string userName, string message)
-        {
-            StreamWriter sw;
+        //public static void SendUserMessages(string userName, string message)
+        //{
+        //    StreamWriter sw;
 
-            e = new StatusChangedEventArgs(userName + " said: " + message);
-            OnStatusChanged(e);
+        //    e = new StatusChangedEventArgs(userName + " said: " + message);
+        //    OnStatusChanged(e);
 
 
-            User[] users = new User[dictionaryUsers.Count];
+        //    User[] users = new User[dictionaryUsers.Count];
 
-            dictionaryUsers.Values.CopyTo(users, 0);
+        //    dictionaryUsers.Values.CopyTo(users, 0);
 
-            for (int i = 0; i < users.Length; i++)
-            {
-                try
-                {
-                    if (message.Trim() == "" || users[i].UserTcp == null)
-                    {
-                        continue;
-                    }
-                    sw = new StreamWriter(users[i].UserTcp.GetStream());
-                    sw.WriteLine(userName + " said: " + message);
-                    sw.Flush();
-                    sw = null;
-                }
-                catch
-                {
-                    DeleteUser(users[i]);
-                }
-            }
-        }
+        //    for (int i = 0; i < users.Length; i++)
+        //    {
+        //        try
+        //        {
+        //            if (message.Trim() == "" || users[i].UserTcp == null)
+        //            {
+        //                continue;
+        //            }
+        //            sw = new StreamWriter(users[i].UserTcp.GetStream());
+        //            sw.WriteLine(userName + " said: " + message);
+        //            sw.Flush();
+        //            sw = null;
+        //        }
+        //        catch
+        //        {
+        //            DeleteUser(users[i]);
+        //        }
+        //    }
+        //}
 
         // MENSAGENS OBJECTO //
 
