@@ -13,14 +13,14 @@
 - O sistema de comunicação deverá ser feito com recursos ao System.Network do C# com recurso a comunicações TCP e UDP.
 
 
-## Login Screen
+### Login Screen
 ![Login Screen](https://i.imgur.com/ueOofLd.png?2)
 
-## Server
+### Server
 ![Server Screen](https://i.imgur.com/gW3bMee.png?1)
 
-## Múltiplos utilizadores
+### Múltiplos utilizadores
 ![Multiple Users](https://i.imgur.com/Z1LrZRz.png)
 
-## Registo de Utilizador
+### Registo de Utilizador
 ![Registration Screen](https://i.imgur.com/glP4z5l.png?1)
